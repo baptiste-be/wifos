@@ -3,193 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WiFos® | Dashboard Réseau</title>
+    <title>WiFos® | Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary: #007AFF;
-            --bg: #f5f5f7;
-            --card: #ffffff;
-            --text: #1d1d1f;
-            --success: #34c759;
+            --primary-red: #e63946;
+            --dark-black: #1a1a1a;
+            --bg-light: #f8f9fa;
+            --glass: rgba(255, 255, 255, 0.9);
+            --shadow: 0 8px 32px rgba(0,0,0,0.1);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--dark-black);
             margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR --- */
+        nav {
+            width: 260px;
+            background: var(--dark-black);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 40px;
+        }
+
+        /* Le logo W avec WiFi intégré */
+        .w-logo {
+            color: var(--primary-red);
+            position: relative;
+            margin-right: 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        header {
-            width: 100%;
-            padding: 20px;
-            background: var(--card);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            text-align: center;
+        .wifi-arcs {
+            font-size: 14px;
+            margin-bottom: -10px;
         }
 
-        .logo {
-            font-size: 24px;
+        .logo-text-red { color: var(--primary-red); }
+        .logo-text-white { color: white; }
+
+        nav ul { list-style: none; padding: 0; }
+        nav ul li {
+            padding: 15px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        nav ul li:hover, nav ul li.active {
+            background: var(--primary-red);
+            color: white;
+        }
+
+        /* --- MAIN CONTENT --- */
+        main {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .header-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .btn-add {
+            background: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
             font-weight: bold;
-            color: var(--primary);
-            letter-spacing: -1px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .container {
-            max-width: 1000px;
-            width: 90%;
-            margin-top: 30px;
-        }
-
+        /* --- DASHBOARD GRIDS --- */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
             margin-bottom: 30px;
         }
 
-        .card {
-            background: var(--card);
+        .stat-card {
+            background: white;
             padding: 20px;
             border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            text-align: center;
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--primary-red);
         }
 
-        .card i {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
+        .stat-card h3 { margin: 0; font-size: 14px; color: #666; }
+        .stat-card p { margin: 10px 0 0; font-size: 24px; font-weight: bold; }
 
-        .status-online {
-            color: var(--success);
-            font-weight: bold;
-        }
-
-        .device-list {
-            background: var(--card);
+        .chart-placeholder {
+            background: white;
             padding: 20px;
             border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            box-shadow: var(--shadow);
+            height: 300px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            justify-content: space-around;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
+        .bar {
+            width: 40px;
+            background: var(--primary-red);
+            border-radius: 5px 5px 0 0;
+            transition: height 1s;
         }
 
-        th {
-            text-align: left;
-            border-bottom: 2px solid var(--bg);
-            padding: 10px;
+        /* --- TUTORIAL OVERLAY --- */
+        #tutorial {
+            position: absolute;
+            top: 100px;
+            left: 280px;
+            width: 300px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.3);
+            z-index: 100;
+            border: 2px solid var(--primary-red);
         }
 
-        td {
-            padding: 15px 10px;
-            border-bottom: 1px solid var(--bg);
-        }
-
-        .btn-scan {
-            background: var(--primary);
+        #tutorial h2 { color: var(--primary-red); font-size: 18px; margin-top: 0; }
+        .close-tut {
+            background: var(--dark-black);
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            font-size: 16px;
+            padding: 8px;
+            width: 100%;
+            border-radius: 5px;
             cursor: pointer;
-            transition: transform 0.2s;
-            margin-bottom: 20px;
+            margin-top: 10px;
         }
 
-        .btn-scan:hover {
-            transform: scale(1.05);
-            background: #0062cc;
+        /* --- MODAL ADD NETWORK --- */
+        #modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 400px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">WiFos® <i class="fas fa-wifi"></i></div>
-</header>
-
-<div class="container">
-    <button class="btn-scan" onclick="simulateScan()">
-        <i class="fas fa-search"></i> Analyser le réseau
-    </button>
-
-    <div class="stats-grid">
-        <div class="card">
-            <i class="fas fa-signal"></i>
-            <h3>Qualité Signal</h3>
-            <p id="signal-strength">Excellent (92%)</p>
+    <nav>
+        <div class="logo-container">
+            <div class="w-logo">
+                <div class="wifi-arcs"><i class="fas fa-wifi"></i></div>
+                W
+            </div>
+            <span><span class="logo-text-red">iF</span><span class="logo-text-white">os</span></span>
         </div>
-        <div class="card">
-            <i class="fas fa-link"></i>
-            <h3>Statut</h3>
-            <p class="status-online">Connecté</p>
+        <ul>
+            <li class="active"><i class="fas fa-th-large"></i> Vue d'ensemble</li>
+            <li><i class="fas fa-network-wired"></i> Mes Réseaux</li>
+            <li><i class="fas fa-laptop"></i> Appareils</li>
+            <li><i class="fas fa-chart-line"></i> Analyses</li>
+            <li><i class="fas fa-tools"></i> Outils Avancés</li>
+        </ul>
+    </nav>
+
+    <main>
+        <div id="tutorial">
+            <h2>Bienvenue sur WiFos®</h2>
+            <p>1. Explorez votre tableau de bord à gauche.<br>
+               2. Ajoutez votre premier réseau avec le bouton rouge.<br>
+               3. Surveillez vos stats en temps réel.</p>
+            <button class="close-tut" onclick="closeTutorial()">J'ai compris !</button>
         </div>
-        <div class="card">
-            <i class="fas fa-microchip"></i>
-            <h3>Appareils</h3>
-            <p id="device-count">4 actifs</p>
+
+        <div class="header-main">
+            <h1>Diagnostic Réseau</h1>
+            <button class="btn-add" onclick="toggleModal(true)">
+                <i class="fas fa-plus"></i> AJOUTER UN RÉSEAU
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Réseaux Actifs</h3>
+                <p id="net-count">1</p>
+            </div>
+            <div class="stat-card">
+                <h3>Appareils en ligne</h3>
+                <p>12</p>
+            </div>
+            <div class="stat-card">
+                <h3>Dernier Scan</h3>
+                <p style="font-size: 16px;">Il y a 2 min (Succès)</p>
+            </div>
+            <div class="stat-card">
+                <h3>Alertes</h3>
+                <p style="color: var(--primary-red);">0</p>
+            </div>
+        </div>
+
+        <h3>Flux de données (Live Diagnostics)</h3>
+        <div class="chart-placeholder" id="chart">
+            <div class="bar" style="height: 40%;"></div>
+            <div class="bar" style="height: 70%;"></div>
+            <div class="bar" style="height: 50%;"></div>
+            <div class="bar" style="height: 90%;"></div>
+            <div class="bar" style="height: 30%;"></div>
+            <div class="bar" style="height: 65%;"></div>
+        </div>
+    </main>
+
+    <div id="modal">
+        <div class="modal-content">
+            <h2>Ajouter un réseau</h2>
+            <label>Nom du WiFi (SSID)</label>
+            <input type="text" placeholder="Ex: MaBox_Orange">
+            <label>Mot de passe</label>
+            <input type="password" placeholder="••••••••">
+            <button class="btn-add" style="width: 100%; justify-content: center;" onclick="addNetwork()">Confirmer</button>
+            <button onclick="toggleModal(false)" style="background:none; border:none; color:grey; width:100; cursor:pointer; margin-top:10px;">Annuler</button>
         </div>
     </div>
 
-    <div class="device-list">
-        <h3>Appareils détectés</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Nom de l'appareil</th>
-                    <th>Adresse IP</th>
-                    <th>Type</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="devices-body">
-                <tr>
-                    <td>iPhone de Sophie</td>
-                    <td>192.168.1.12</td>
-                    <td>Mobile</td>
-                    <td><i class="fas fa-ellipsis-h"></i></td>
-                </tr>
-                <tr>
-                    <td>MacBook Pro</td>
-                    <td>192.168.1.15</td>
-                    <td>Ordinateur</td>
-                    <td><i class="fas fa-ellipsis-h"></i></td>
-                </tr>
-                <tr>
-                    <td>Smart TV Salon</td>
-                    <td>192.168.1.20</td>
-                    <td>TV</td>
-                    <td><i class="fas fa-ellipsis-h"></i></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+    <script>
+        function closeTutorial() {
+            document.getElementById('tutorial').style.display = 'none';
+        }
 
-<script>
-    function simulateScan() {
-        const btn = document.querySelector('.btn-scan');
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scan en cours...';
-        btn.disabled = true;
+        function toggleModal(show) {
+            document.getElementById('modal').style.display = show ? 'flex' : 'none';
+        }
 
-        setTimeout(() => {
-            btn.innerHTML = '<i class="fas fa-search"></i> Analyser le réseau';
-            btn.disabled = false;
-            alert("Analyse WiFos® terminée. Aucun nouvel appareil détecté.");
+        function addNetwork() {
+            const count = document.getElementById('net-count');
+            count.innerText = parseInt(count.innerText) + 1;
+            toggleModal(false);
+            alert("Réseau WiFos® ajouté avec succès !");
+        }
+
+        // Animation de simulation du graphique
+        setInterval(() => {
+            const bars = document.querySelectorAll('.bar');
+            bars.forEach(bar => {
+                const newHeight = Math.floor(Math.random() * 90) + 10;
+                bar.style.height = newHeight + '%';
+            });
         }, 2000);
-    }
-</script>
-
+    </script>
 </body>
 </html>
